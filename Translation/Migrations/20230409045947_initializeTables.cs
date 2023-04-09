@@ -1,18 +1,18 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-#nullable disable
-
 namespace Translation.Migrations
 {
-    /// <inheritdoc />
     public partial class initializeTables : Migration
     {
-        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.EnsureSchema(
+                name: "translation");
+
             migrationBuilder.CreateTable(
                 name: "languages",
+                schema: "translation",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -29,6 +29,7 @@ namespace Translation.Migrations
 
             migrationBuilder.CreateTable(
                 name: "translation_files",
+                schema: "translation",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -42,6 +43,7 @@ namespace Translation.Migrations
 
             migrationBuilder.CreateTable(
                 name: "translation_keys",
+                schema: "translation",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -55,6 +57,7 @@ namespace Translation.Migrations
 
             migrationBuilder.CreateTable(
                 name: "translation_values",
+                schema: "translation",
                 columns: table => new
                 {
                     language_id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -68,12 +71,14 @@ namespace Translation.Migrations
                     table.ForeignKey(
                         name: "FK_translation_values_languages_language_id",
                         column: x => x.language_id,
+                        principalSchema: "translation",
                         principalTable: "languages",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_translation_values_translation_keys_translation_key_id",
                         column: x => x.translation_key_id,
+                        principalSchema: "translation",
                         principalTable: "translation_keys",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
@@ -81,36 +86,42 @@ namespace Translation.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "IX_languages_code",
+                schema: "translation",
                 table: "languages",
                 column: "code",
                 unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_translation_files_file_path",
+                schema: "translation",
                 table: "translation_files",
                 column: "file_path",
                 unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_translation_values_language_id",
+                schema: "translation",
                 table: "translation_values",
                 column: "language_id");
         }
 
-        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "translation_files");
+                name: "translation_files",
+                schema: "translation");
 
             migrationBuilder.DropTable(
-                name: "translation_values");
+                name: "translation_values",
+                schema: "translation");
 
             migrationBuilder.DropTable(
-                name: "languages");
+                name: "languages",
+                schema: "translation");
 
             migrationBuilder.DropTable(
-                name: "translation_keys");
+                name: "translation_keys",
+                schema: "translation");
         }
     }
 }

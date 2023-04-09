@@ -132,7 +132,7 @@ public class TranslationKeyRepository
             .ToList();
     }
 
-    public TranslationKey? CreateItemFromResult(string key, string module)
+    public TranslationKey CreateItemFromResult(string key, string module)
     {
         var translationKey = new TranslationKey()
         {
