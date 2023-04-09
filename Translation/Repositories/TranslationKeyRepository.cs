@@ -145,6 +145,13 @@ public class TranslationKeyRepository
         return translationKey;
     }
 
+
+    public void AddRange(IEnumerable<TranslationKey> translationKeys)
+    {
+        _dbContext.TranslationKeys.AddRange(translationKeys);
+        _dbContext.SaveChanges();
+    }
+
     public void RemoveAllUnusedKeys()
     {
         var unusedTranslationKeys = _dbContext

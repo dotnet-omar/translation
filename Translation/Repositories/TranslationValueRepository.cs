@@ -97,25 +97,6 @@ public class TranslationValueRepository
         return translationValue;
     }
 
-    public TranslationValue? CreateItemFromResult(
-        Guid translationKeyId,
-        Guid languageId,
-        string value
-    )
-    {
-        var translationValue = new TranslationValue
-        {
-            TranslationKeyId = translationKeyId,
-            LanguageId = languageId,
-            DefaultValue = value,
-        };
-
-        _dbContext.TranslationValues.Add(translationValue);
-        _dbContext.SaveChanges();
-
-        return translationValue;
-    }
-
     public TranslationValueGetDto? UpdateDefaultValue(TranslationValue translationValue, string value)
     {
         translationValue.DefaultValue = value;
@@ -131,6 +112,18 @@ public class TranslationValueRepository
             .Include(x => x.TranslationKey)
             .Where(x => x.TranslationKey.Module == module && x.LanguageId == languageId)
             .ToList();
+    }
+
+    public void AddRange(IEnumerable<TranslationValue> translationValues)
+    {
+        _dbContext.TranslationValues.AddRange(translationValues);
+        _dbContext.SaveChanges();
+    }
+
+    public void UpdateRange(IEnumerable<TranslationValue> translationValues)
+    {
+        _dbContext.TranslationValues.UpdateRange(translationValues);
+        _dbContext.SaveChanges();
     }
 
     public void DeleteRange(IEnumerable<TranslationValue> translationValues)

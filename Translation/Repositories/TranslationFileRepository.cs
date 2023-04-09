@@ -23,12 +23,11 @@ public class TranslationFileRepository
             .FirstOrDefault(x => x.FilePath == filePath);
     }
 
-    public TranslationFile? CreateOrUpdate(TranslationFile translationFile)
+    public void CreateOrUpdate(TranslationFile translationFile)
     {
         var existingTranslationFile = Item(translationFile.FilePath);
 
-        if (existingTranslationFile == null)
-            _dbContext.TranslationFiles.Add(translationFile);
+        if (existingTranslationFile == null) _dbContext.TranslationFiles.Add(translationFile);
         else
         {
             existingTranslationFile.FileHash = translationFile.FileHash;
@@ -36,8 +35,6 @@ public class TranslationFileRepository
         }
 
         _dbContext.SaveChanges();
-
-        return Item(translationFile.FilePath);
     }
 
     public void RemoveRange(IEnumerable<TranslationFile> translationFiles)

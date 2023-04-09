@@ -57,41 +57,60 @@ public class TranslationService
             var (languageCode, module) = translationFile.GetFileInfo();
 
             var language = savedLanguages.Find(l => l.Code == languageCode)!;
-            var translationResults = GetFileTranslations(fileContent);
+
             var savedTranslationsKey = _translationKeyRepository.GetAllBy(module);
             var savedTranslationsValue = _translationValueRepository.GetAll(module, language.Id);
 
+            var translationResults = GetFileTranslations(fileContent);
+            var currentTranslationsKey = translationResults
+                .Select(x => new TranslationKey() { Key = x.Key, Module = module });
+
+            var newTranslationsKey = currentTranslationsKey
+                .Where(x => savedTranslationsKey.All(y => y.Key != x.Key))
+                .ToList();
+
+            _translationKeyRepository.AddRange(newTranslationsKey);
+
+            var allTranslationsKey = savedTranslationsKey.Concat(newTranslationsKey).ToList();
+
+            var newTranslationsValue = new List<TranslationValue>();
+            var updatedTranslationsValue = new List<TranslationValue>();
+
             foreach (var result in translationResults)
             {
-                var translationKey = savedTranslationsKey.FirstOrDefault(x => x.Key == result.Key);
-
-                if (translationKey == null)
-                {
-                    translationKey = _translationKeyRepository.CreateItemFromResult(result.Key, module)!;
-                }
+                var translationKey = allTranslationsKey.First(x => x.Key == result.Key);
 
                 var translationValue = savedTranslationsValue
                     .FirstOrDefault(x => x.TranslationKeyId == translationKey.Id);
 
                 if (translationValue == null)
                 {
-                    _translationValueRepository.CreateItemFromResult(
-                        translationKey.Id,
-                        language.Id,
-                        result.Value
-                    );
+                    var newTranslationValue = new TranslationValue
+                    {
+                        TranslationKeyId = translationKey.Id,
+                        LanguageId = language.Id,
+                        DefaultValue = result.Value,
+                    };
+
+                    newTranslationsValue.Add(newTranslationValue);
                 }
                 else if (translationValue.DefaultValue != result.Value)
                 {
-                    _translationValueRepository.UpdateDefaultValue(translationValue, result.Value);
+                    translationValue.DefaultValue = result.Value;
+                    updatedTranslationsValue.Add(translationValue);
                 }
             }
 
-            var unusedSavedTranslationValues = _translationValueRepository
-                .GetAll(module, language.Id)
-                .Where(x =>
-                    translationResults.All(y => y.Key != x.TranslationKey.Key)
-                )
+            _translationValueRepository.AddRange(newTranslationsValue);
+            _translationValueRepository.UpdateRange(updatedTranslationsValue);
+
+            var allTranslationsValue = savedTranslationsValue
+                .Concat(newTranslationsValue)
+                .Concat(updatedTranslationsValue)
+                .ToList();
+
+            var unusedSavedTranslationValues = allTranslationsValue
+                .Where(x => translationResults.All(y => y.Key != x.TranslationKey.Key))
                 .ToList();
 
             _translationValueRepository.DeleteRange(unusedSavedTranslationValues);
@@ -173,7 +192,7 @@ public class TranslationService
 
         return translations;
     }
-    
+
     private static string GetHash(string text)
     {
         var textBytes = Encoding.UTF8.GetBytes(text);
