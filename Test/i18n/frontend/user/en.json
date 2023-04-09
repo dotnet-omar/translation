@@ -1,0 +1,18 @@
+{
+  "translate_new_user": "New User",
+  "translate_edit_user": "Edit User",
+  "translate_add_new_user": "Add new user",
+  "translate_update_existing_user": "Update existing user",
+  "translate_user_details": "User details",
+  "translate_users_list": "Users list",
+  "translate_image": "Image",
+  "translate_employee_number": "Employee number",
+  "translate_permissions": "Permissions",
+  "translate_confirm_password": "Confirm password",
+  "translate_registration_time": "Registration Time",
+  "translate_update_user_permission_between_brackets_name": "Update user permission ({{name}})",
+  "translate_update_permissions": "Update permissions",
+  "translate_update_user_permissions": "Update user permissions",
+  "translate_is_signatory_qm": "Is signatory",
+  "translate_assigned_permissions": "Assigned permissions"
+}

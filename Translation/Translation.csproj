@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <Title>DotnetOmar Translation</Title>
+        <Authors>Omar Elsayed</Authors>
+        <Description>Dynamic Translation</Description>
+        <Copyright>Omar Elsayed</Copyright>
+        <PackageProjectUrl>https://github.com/dotnet-omar/translation</PackageProjectUrl>
+        <PackageIcon>favicon.png</PackageIcon>
+        <RepositoryUrl>https://github.com/dotnet-omar/translation</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageTags>DotnetOmar, Translation</PackageTags>
+        <PackageReleaseNotes>initialize version</PackageReleaseNotes>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="LinqKit" Version="1.2.4" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.0-preview.2.23128.3" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0-preview.2.23128.3">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.0-preview.2.23128.3" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="README.md" Pack="true" PackagePath="\"/>
+        <None Include="favicon.png" Pack="true" PackagePath="\"/>
+    </ItemGroup>
+</Project>

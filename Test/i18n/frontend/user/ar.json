@@ -1,0 +1,18 @@
+{
+  "translate_new_user": "مستخدم جديد",
+  "translate_edit_user": "تعديل مستخدم",
+  "translate_add_new_user": "إضافة مستخدم جديد",
+  "translate_update_existing_user": "تحديث مستخدم",
+  "translate_user_details": "تفاصيل المستخدم",
+  "translate_users_list": "قائمة المستخدمين",
+  "translate_image": "الصورة",
+  "translate_employee_number": "الرقم الوظيفي",
+  "translate_permissions": "الصلاحيات",
+  "translate_confirm_password": "تأكيد كلمة المرور",
+  "translate_registration_time": "وقت التسجيل",
+  "translate_update_user_permission_between_brackets_name": "تحديث صلاحيات المستخدم ({{name}})",
+  "translate_update_permissions": "تحديث الصلاحيات",
+  "translate_update_user_permissions": "تحديث صلاحيات المستخدم",
+  "translate_is_signatory_qm": "مصرح بالتوقيع؟",
+  "translate_assigned_permissions": "الصلاحيات المعطاه"
+}

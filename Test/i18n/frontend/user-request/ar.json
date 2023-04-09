@@ -1,0 +1,14 @@
+{
+  "translate_users_requests": "طلبات المستخدمين",
+  "translate_content": "المحتوى",
+  "translate_type": "النوع",
+  "translate_creation_time": "تاريخ الطلب",
+  "translate_status": "الحالة",
+  "translate_open": "مفتوح",
+  "translate_closed": "مغلق",
+  "translate_created_by": "بواسطة",
+  "translate_request_details": "تفاصيل الطلب",
+  "translate_edit": "تعديل",
+  "translate_add_comment": "اضافة تعليق",
+  "translate_delete_request": "حذف الطلب"
+}

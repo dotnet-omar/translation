@@ -1,0 +1,16 @@
+{
+  "languages": [
+    {
+      "label": "العربية",
+      "code": "ar",
+      "isRtl": true,
+      "order": 1
+    },
+    {
+      "label": "English",
+      "code": "en",
+      "isRtl": false,
+      "order": 2
+    }
+  ]
+}

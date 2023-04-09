@@ -1,0 +1,14 @@
+{
+  "translate_users_requests": "Users requests",
+  "translate_content": "Content",
+  "translate_type": "Type",
+  "translate_creation_time": "Creation time",
+  "translate_status": "Status",
+  "translate_open": "Open",
+  "translate_closed": "Closed",
+  "translate_created_by": "Created by",
+  "translate_request_details": "Request Details",
+  "translate_edit": "Edit",
+  "translate_add_comment": "Add Comment",
+  "translate_delete_request": "Delete Request"
+}
