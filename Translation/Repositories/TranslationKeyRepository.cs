@@ -1,4 +1,4 @@
-using LinqKit.Core;
+using LinqKit;
 using Translation.Classes;
 using Translation.Data;
 using Translation.Dto.TranslationKey;
