@@ -13,6 +13,13 @@ public class TranslationValueRepository
 
     public TranslationValueRepository(TranslationContext dbContext) => _dbContext = dbContext;
 
+    public List<TranslationValue> ListAll() =>
+        _dbContext
+            .TranslationValues
+            .Include(x => x.TranslationKey)
+            .Include(x => x.Language)
+            .ToList();
+
     public Pagination<TranslationValueGetDto> List(
         int pageNumber,
         int pageSize
@@ -117,30 +124,33 @@ public class TranslationValueRepository
     public void AddRange(IEnumerable<TranslationValue> translationValues)
     {
         _dbContext.TranslationValues.AddRange(translationValues);
-        _dbContext.SaveChanges();
     }
 
     public void UpdateRange(IEnumerable<TranslationValue> translationValues)
     {
         _dbContext.TranslationValues.UpdateRange(translationValues);
-        _dbContext.SaveChanges();
     }
 
     public void DeleteRange(IEnumerable<TranslationValue> translationValues)
     {
         _dbContext.TranslationValues.RemoveRange(translationValues);
-        _dbContext.SaveChanges();
     }
 
-    public void DeleteAllByFiles(IEnumerable<TranslationFile> translationFiles)
+    public void DeleteAllByFiles(List<TranslationFile> translationFiles)
     {
-        foreach (var translationFile in translationFiles)
-        {
-            var (languageCode, module) = translationFile.GetFileInfo();
-            var translationValues = _dbContext
-                .TranslationValues
-                .Where(x => x.Language.Code == languageCode && x.TranslationKey.Module == module);
-            _dbContext.TranslationValues.RemoveRange(translationValues);
-        }
+        var items = translationFiles.Select(x => x.GetFileInfo()).ToList();
+
+        var translationValuesQuery = _dbContext
+            .TranslationValues
+            .Where(x =>
+                items.Any(y => y.languageCode == x.Language.Code && y.module == x.TranslationKey.Module)
+            );
+
+        _dbContext.TranslationValues.RemoveRange(translationValuesQuery);
+    }
+
+    public void Commit()
+    {
+        _dbContext.SaveChanges();
     }
 }

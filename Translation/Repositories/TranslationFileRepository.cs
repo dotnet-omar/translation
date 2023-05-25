@@ -33,13 +33,15 @@ public class TranslationFileRepository
             existingTranslationFile.FileHash = translationFile.FileHash;
             _dbContext.TranslationFiles.Update(existingTranslationFile);
         }
-
-        _dbContext.SaveChanges();
     }
 
     public void RemoveRange(IEnumerable<TranslationFile> translationFiles)
     {
         _dbContext.TranslationFiles.RemoveRange(translationFiles);
+    }
+
+    public void Commit()
+    {
         _dbContext.SaveChanges();
     }
 }

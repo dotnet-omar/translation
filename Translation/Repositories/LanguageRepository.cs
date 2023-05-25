@@ -11,6 +11,12 @@ public class LanguageRepository
 
     public LanguageRepository(TranslationContext dbContext) => _dbContext = dbContext;
 
+    public List<Language> ListAll() => _dbContext
+        .Languages
+        .OrderBy(x => x.Order)
+        .ThenBy(x => x.Code)
+        .ToList();
+
     public Pagination<LanguageListDto> List(
         string? keyword,
         int pageNumber,
@@ -98,11 +104,11 @@ public class LanguageRepository
         return true;
     }
 
-    public void CreateOrUpdate(List<Language> languages)
+    public void CreateOrUpdate(List<Language> savedLanguages, List<Language> currentLanguages)
     {
-        foreach (var language in languages)
+        foreach (var language in currentLanguages)
         {
-            var existingLanguage = _dbContext.Languages.FirstOrDefault(x => x.Code == language.Code);
+            var existingLanguage = savedLanguages.FirstOrDefault(x => x.Code == language.Code);
 
             if (existingLanguage == null)
             {
@@ -124,18 +130,6 @@ public class LanguageRepository
                 existingLanguage.IsLocked = language.IsLocked;
             }
         }
-
-        _dbContext.SaveChanges();
-    }
-
-    public List<LanguageCodeDto> GetAllLanguages()
-    {
-        return _dbContext
-            .Languages
-            .OrderBy(x => x.Order)
-            .ThenBy(x => x.Code)
-            .Select(LanguageCodeDto.Mapper())
-            .ToList();
     }
 
     public IQueryable<Language> GetItemAsQueryable(Guid? id, string? code)
@@ -147,18 +141,18 @@ public class LanguageRepository
             );
     }
 
-    public void ResetAllIsLockedLanguages()
+    public void ResetAllIsLockedLanguages(List<Language> languages)
     {
-        var languages = _dbContext
-            .Languages
-            .ToList();
-
         foreach (var language in languages)
         {
             language.IsLocked = false;
         }
 
         _dbContext.Languages.UpdateRange(languages);
+    }
+
+    public void Commit()
+    {
         _dbContext.SaveChanges();
     }
 }

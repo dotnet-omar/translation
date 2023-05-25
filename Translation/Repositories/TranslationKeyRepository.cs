@@ -12,6 +12,8 @@ public class TranslationKeyRepository
 
     public TranslationKeyRepository(TranslationContext dbContext) => _dbContext = dbContext;
 
+    public List<TranslationKey> ListAll() => _dbContext.TranslationKeys.ToList();
+
     public Pagination<TranslationKeyListDto> List(
         Guid languageId,
         string? key = null,
@@ -149,7 +151,6 @@ public class TranslationKeyRepository
     public void AddRange(IEnumerable<TranslationKey> translationKeys)
     {
         _dbContext.TranslationKeys.AddRange(translationKeys);
-        _dbContext.SaveChanges();
     }
 
     public void RemoveAllUnusedKeys()
@@ -159,6 +160,10 @@ public class TranslationKeyRepository
             .Where(x => !x.Values.Any() || x.Values.All(y => y.DefaultValue == null));
 
         _dbContext.TranslationKeys.RemoveRange(unusedTranslationKeys);
+    }
+
+    public void Commit()
+    {
         _dbContext.SaveChanges();
     }
 }

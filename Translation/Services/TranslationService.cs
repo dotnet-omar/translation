@@ -29,14 +29,24 @@ public class TranslationService
 
     public void Sync(string folderPath, string languagesFilePath)
     {
-        SyncLanguages(languagesFilePath);
-        SyncTranslations(folderPath);
+        var savedLanguages = _languageRepository.ListAll();
+        SyncLanguages(languagesFilePath, savedLanguages);
+        SyncTranslations(folderPath, savedLanguages);
     }
 
-    private void SyncTranslations(string folderPath)
+    private void SyncLanguages(string languagesFilePath, List<Language> savedLanguages)
     {
-        var savedLanguages = _languageRepository.GetAllLanguages();
+        var currentLanguages = GetCurrentLanguages(languagesFilePath);
+        _languageRepository.ResetAllIsLockedLanguages(savedLanguages);
+        _languageRepository.CreateOrUpdate(savedLanguages, currentLanguages);
+        _languageRepository.Commit();
+    }
+
+    private void SyncTranslations(string folderPath, List<Language> savedLanguages)
+    {
         var savedTranslationFiles = _translationFileRepository.List();
+        var savedTranslationsKey = _translationKeyRepository.ListAll();
+        var savedTranslationsValue = _translationValueRepository.ListAll();
         var currentTranslationFilesPath = GetCurrentFilesPath(folderPath).ToList();
 
         foreach (var filePath in currentTranslationFilesPath)
@@ -58,20 +68,22 @@ public class TranslationService
 
             var language = savedLanguages.Find(l => l.Code == languageCode)!;
 
-            var savedTranslationsKey = _translationKeyRepository.GetAllBy(module);
-            var savedTranslationsValue = _translationValueRepository.GetAll(module, language.Id);
+            var savedModuleTranslationsKey = savedTranslationsKey.Where(x => x.Module == module).ToList();
+            var savedModuleTranslationsValue = savedTranslationsValue
+                .Where(x => x.TranslationKey.Module == module && x.LanguageId == language.Id)
+                .ToList();
 
             var translationResults = GetFileTranslations(fileContent);
             var currentTranslationsKey = translationResults
                 .Select(x => new TranslationKey() { Key = x.Key, Module = module });
 
             var newTranslationsKey = currentTranslationsKey
-                .Where(x => savedTranslationsKey.All(y => y.Key != x.Key))
+                .Where(x => savedModuleTranslationsKey.All(y => y.Key != x.Key))
                 .ToList();
 
             _translationKeyRepository.AddRange(newTranslationsKey);
 
-            var allTranslationsKey = savedTranslationsKey.Concat(newTranslationsKey).ToList();
+            var allTranslationsKey = savedModuleTranslationsKey.Concat(newTranslationsKey).ToList();
 
             var newTranslationsValue = new List<TranslationValue>();
             var updatedTranslationsValue = new List<TranslationValue>();
@@ -80,7 +92,7 @@ public class TranslationService
             {
                 var translationKey = allTranslationsKey.First(x => x.Key == result.Key);
 
-                var translationValue = savedTranslationsValue
+                var translationValue = savedModuleTranslationsValue
                     .FirstOrDefault(x => x.TranslationKeyId == translationKey.Id);
 
                 if (translationValue == null)
@@ -104,7 +116,7 @@ public class TranslationService
             _translationValueRepository.AddRange(newTranslationsValue);
             _translationValueRepository.UpdateRange(updatedTranslationsValue);
 
-            var allTranslationsValue = savedTranslationsValue
+            var allTranslationsValue = savedModuleTranslationsValue
                 .Concat(newTranslationsValue)
                 .Concat(updatedTranslationsValue)
                 .ToList();
@@ -127,13 +139,12 @@ public class TranslationService
         _translationFileRepository.RemoveRange(unusedSavedTranslationFiles);
 
         _translationKeyRepository.RemoveAllUnusedKeys();
-    }
 
-    private void SyncLanguages(string languagesFilePath)
-    {
-        var currentLanguages = GetCurrentLanguages(languagesFilePath);
-        _languageRepository.ResetAllIsLockedLanguages();
-        _languageRepository.CreateOrUpdate(currentLanguages);
+        _translationKeyRepository.Commit();
+
+        _translationValueRepository.Commit();
+
+        _translationFileRepository.Commit();
     }
 
     private static IEnumerable<string> GetCurrentFilesPath(string folderPath)
