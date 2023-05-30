@@ -9,16 +9,13 @@ public class TranslationRepository
 
     public TranslationRepository(TranslationContext dbContext) => _dbContext = dbContext;
 
-    public Dictionary<string, string> GetTranslations(string module, string languageCode)
-    {
-        return _dbContext
-            .TranslationValues
-            .Include(x => x.TranslationKey)
-            .Where(x => x.Language.Code == languageCode)
-            .Where(x => x.TranslationKey.Module == module)
-            .ToDictionary(
-                x => x.TranslationKey.Key,
-                x => x.OverriddenValue ?? x.DefaultValue ?? ""
-            );
-    }
+    public Dictionary<string, string> GetTranslations(string module, string languageCode) => _dbContext
+        .TranslationValues
+        .Include(x => x.TranslationKey)
+        .Where(x => x.Language.Code == languageCode)
+        .Where(x => x.TranslationKey.Module == module)
+        .ToDictionary(
+            x => x.TranslationKey.Key,
+            x => x.OverriddenValue ?? x.DefaultValue ?? ""
+        );
 }

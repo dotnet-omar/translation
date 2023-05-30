@@ -59,11 +59,21 @@ public class TranslationService
 
             if (savedTranslationFile != null && savedTranslationFile.FileHash == fileHash) continue;
 
-            var translationFile = new TranslationFile
+            TranslationFile translationFile;
+
+            if (savedTranslationFile != null)
             {
-                FilePath = filePath,
-                FileHash = fileHash
-            };
+                translationFile = savedTranslationFile;
+                translationFile.FileHash = fileHash;
+            }
+            else
+            {
+                translationFile = new TranslationFile
+                {
+                    FilePath = filePath,
+                    FileHash = fileHash
+                };
+            }
 
             var (languageCode, module) = translationFile.GetFileInfo();
 
@@ -128,14 +138,15 @@ public class TranslationService
 
             _translationValueRepository.DeleteRange(unusedSavedTranslationValues);
 
-            _translationFileRepository.CreateOrUpdate(translationFile);
+            if (translationFile.Id.Equals(null)) _translationFileRepository.Create(translationFile);
+            else _translationFileRepository.Update(translationFile);
         }
 
         var unusedSavedTranslationFiles = savedTranslationFiles
             .Where(x => currentTranslationFilesPath.All(y => y != x.FilePath))
             .ToList();
 
-        _translationValueRepository.DeleteAllByFiles(unusedSavedTranslationFiles);
+        _translationValueRepository.DeleteAllByFiles(unusedSavedTranslationFiles, savedTranslationsValue);
 
         _translationFileRepository.RemoveRange(unusedSavedTranslationFiles);
 

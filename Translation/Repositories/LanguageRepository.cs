@@ -57,12 +57,9 @@ public class LanguageRepository
         return list;
     }
 
-    public LanguageGetDto? Item(Guid? id, string? code)
-    {
-        return GetItemAsQueryable(id, code)
-            .Select(LanguageGetDto.Mapper())
-            .FirstOrDefault();
-    }
+    public LanguageGetDto? Item(Guid? id, string? code) => GetItemAsQueryable(id, code)
+        .Select(LanguageGetDto.Mapper())
+        .FirstOrDefault();
 
     public LanguageGetDto? Create(LanguageCreateDto languageCreateDto)
     {
@@ -132,27 +129,18 @@ public class LanguageRepository
         }
     }
 
-    public IQueryable<Language> GetItemAsQueryable(Guid? id, string? code)
-    {
-        return _dbContext
-            .Languages
-            .Where(x =>
-                id.HasValue ? x.Id == id : (!string.IsNullOrEmpty(code) && x.Code == code)
-            );
-    }
+    public IQueryable<Language> GetItemAsQueryable(Guid? id, string? code) => _dbContext
+        .Languages
+        .Where(x =>
+            id.HasValue ? x.Id == id : (!string.IsNullOrEmpty(code) && x.Code == code)
+        );
+
 
     public void ResetAllIsLockedLanguages(List<Language> languages)
     {
-        foreach (var language in languages)
-        {
-            language.IsLocked = false;
-        }
-
+        foreach (var language in languages) language.IsLocked = false;
         _dbContext.Languages.UpdateRange(languages);
     }
 
-    public void Commit()
-    {
-        _dbContext.SaveChanges();
-    }
+    public void Commit() => _dbContext.SaveChanges();
 }

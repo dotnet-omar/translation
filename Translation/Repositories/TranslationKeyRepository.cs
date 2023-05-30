@@ -118,40 +118,8 @@ public class TranslationKeyRepository
             .FirstOrDefault();
     }
 
-    public TranslationKey? GetItemBy(string key, string module)
-    {
-        return _dbContext
-            .TranslationKeys
-            .FirstOrDefault(x => x.Key == key && x.Module == module);
-    }
-
-
-    public List<TranslationKey> GetAllBy(string module)
-    {
-        return _dbContext
-            .TranslationKeys
-            .Where(x => x.Module == module)
-            .ToList();
-    }
-
-    public TranslationKey CreateItemFromResult(string key, string module)
-    {
-        var translationKey = new TranslationKey()
-        {
-            Key = key,
-            Module = module
-        };
-
-        _dbContext.TranslationKeys.Add(translationKey);
-        _dbContext.SaveChanges();
-        return translationKey;
-    }
-
-
-    public void AddRange(IEnumerable<TranslationKey> translationKeys)
-    {
+    public void AddRange(IEnumerable<TranslationKey> translationKeys) =>
         _dbContext.TranslationKeys.AddRange(translationKeys);
-    }
 
     public void RemoveAllUnusedKeys()
     {
@@ -162,8 +130,5 @@ public class TranslationKeyRepository
         _dbContext.TranslationKeys.RemoveRange(unusedTranslationKeys);
     }
 
-    public void Commit()
-    {
-        _dbContext.SaveChanges();
-    }
+    public void Commit() => _dbContext.SaveChanges();
 }

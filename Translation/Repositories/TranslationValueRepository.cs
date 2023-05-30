@@ -54,16 +54,13 @@ public class TranslationValueRepository
         return list;
     }
 
-    public TranslationValueGetDto? Item(Guid languageId, Guid translationId)
-    {
-        return _dbContext
-            .TranslationValues
-            .AsExpandable()
-            .Where(x => x.LanguageId == languageId)
-            .Where(x => x.TranslationKeyId == translationId)
-            .Select(TranslationValueGetDto.Mapper())
-            .FirstOrDefault();
-    }
+    public TranslationValueGetDto? Item(Guid languageId, Guid translationId) => _dbContext
+        .TranslationValues
+        .AsExpandable()
+        .Where(x => x.LanguageId == languageId)
+        .Where(x => x.TranslationKeyId == translationId)
+        .Select(TranslationValueGetDto.Mapper())
+        .FirstOrDefault();
 
     public TranslationValueGetDto? Create(Guid translationKeyId, Guid languageId, string value)
     {
@@ -93,56 +90,29 @@ public class TranslationValueRepository
         _dbContext.SaveChanges();
     }
 
-    public TranslationValue? GetItemAsDefault(Guid languageId, Guid translationId)
-    {
-        var translationValue = _dbContext
-            .TranslationValues
-            .Include(x => x.TranslationKey)
-            .Where(x => x.LanguageId == languageId)
-            .FirstOrDefault(x => x.TranslationKeyId == translationId);
+    public TranslationValue? GetItemAsDefault(Guid languageId, Guid translationId) => _dbContext
+        .TranslationValues
+        .Include(x => x.TranslationKey)
+        .Where(x => x.LanguageId == languageId)
+        .FirstOrDefault(x => x.TranslationKeyId == translationId);
 
-        return translationValue;
-    }
-
-    public TranslationValueGetDto? UpdateDefaultValue(TranslationValue translationValue, string value)
-    {
-        translationValue.DefaultValue = value;
-        _dbContext.TranslationValues.Update(translationValue);
-        _dbContext.SaveChanges();
-        return Item(translationValue.LanguageId, translationValue.TranslationKeyId);
-    }
-
-    public List<TranslationValue> GetAll(string module, Guid languageId)
-    {
-        return _dbContext
-            .TranslationValues
-            .Include(x => x.TranslationKey)
-            .Where(x => x.TranslationKey.Module == module && x.LanguageId == languageId)
-            .ToList();
-    }
-
-    public void AddRange(IEnumerable<TranslationValue> translationValues)
-    {
+    public void AddRange(IEnumerable<TranslationValue> translationValues) =>
         _dbContext.TranslationValues.AddRange(translationValues);
-    }
 
-    public void UpdateRange(IEnumerable<TranslationValue> translationValues)
-    {
+    public void UpdateRange(IEnumerable<TranslationValue> translationValues) =>
         _dbContext.TranslationValues.UpdateRange(translationValues);
-    }
 
-    public void DeleteRange(IEnumerable<TranslationValue> translationValues)
-    {
+    public void DeleteRange(IEnumerable<TranslationValue> translationValues) =>
         _dbContext.TranslationValues.RemoveRange(translationValues);
-    }
 
-    public void DeleteAllByFiles(List<TranslationFile> translationFiles)
+    public void DeleteAllByFiles(
+        IEnumerable<TranslationFile> translationFiles,
+        IEnumerable<TranslationValue> savedTranslationsValue
+    )
     {
         var items = translationFiles.Select(x => x.GetFileInfo()).ToList();
 
-        var translationValuesQuery = _dbContext
-            .TranslationValues
-            .AsEnumerable()
+        var translationValuesQuery = savedTranslationsValue
             .Where(x =>
                 items.Any(y => y.languageCode == x.Language.Code && y.module == x.TranslationKey.Module)
             )
@@ -151,8 +121,5 @@ public class TranslationValueRepository
         _dbContext.TranslationValues.RemoveRange(translationValuesQuery);
     }
 
-    public void Commit()
-    {
-        _dbContext.SaveChanges();
-    }
+    public void Commit() => _dbContext.SaveChanges();
 }
