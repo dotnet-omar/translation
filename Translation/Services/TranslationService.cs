@@ -29,21 +29,22 @@ public class TranslationService
 
     public void Sync(string folderPath, string languagesFilePath)
     {
-        var savedLanguages = _languageRepository.ListAll();
-        SyncLanguages(languagesFilePath, savedLanguages);
-        SyncTranslations(folderPath, savedLanguages);
+        SyncLanguages(languagesFilePath);
+        SyncTranslations(folderPath);
     }
 
-    private void SyncLanguages(string languagesFilePath, List<Language> savedLanguages)
+    private void SyncLanguages(string languagesFilePath)
     {
+        var savedLanguages = _languageRepository.ListAll();
         var currentLanguages = GetCurrentLanguages(languagesFilePath);
         _languageRepository.ResetAllIsLockedLanguages(savedLanguages);
         _languageRepository.CreateOrUpdate(savedLanguages, currentLanguages);
         _languageRepository.Commit();
     }
 
-    private void SyncTranslations(string folderPath, List<Language> savedLanguages)
+    private void SyncTranslations(string folderPath)
     {
+        var savedLanguages = _languageRepository.ListAll();
         var savedTranslationFiles = _translationFileRepository.List();
         var savedTranslationsKey = _translationKeyRepository.ListAll();
         var savedTranslationsValue = _translationValueRepository.ListAll();

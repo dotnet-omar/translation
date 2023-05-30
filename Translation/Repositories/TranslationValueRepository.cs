@@ -142,9 +142,11 @@ public class TranslationValueRepository
 
         var translationValuesQuery = _dbContext
             .TranslationValues
+            .AsEnumerable()
             .Where(x =>
                 items.Any(y => y.languageCode == x.Language.Code && y.module == x.TranslationKey.Module)
-            );
+            )
+            .ToList();
 
         _dbContext.TranslationValues.RemoveRange(translationValuesQuery);
     }
