@@ -96,30 +96,15 @@ public class TranslationValueRepository
         .Where(x => x.LanguageId == languageId)
         .FirstOrDefault(x => x.TranslationKeyId == translationId);
 
-    public void AddRange(IEnumerable<TranslationValue> translationValues) =>
-        _dbContext.TranslationValues.AddRange(translationValues);
-
-    public void UpdateRange(IEnumerable<TranslationValue> translationValues) =>
-        _dbContext.TranslationValues.UpdateRange(translationValues);
-
-    public void DeleteRange(IEnumerable<TranslationValue> translationValues) =>
-        _dbContext.TranslationValues.RemoveRange(translationValues);
-
-    public void DeleteAllByFiles(
-        IEnumerable<TranslationFile> translationFiles,
-        IEnumerable<TranslationValue> savedTranslationsValue
-    )
+    public void AddRange(IEnumerable<TranslationValue> translationValues)
     {
-        var items = translationFiles.Select(x => x.GetFileInfo()).ToList();
-
-        var translationValuesQuery = savedTranslationsValue
-            .Where(x =>
-                items.Any(y => y.languageCode == x.Language.Code && y.module == x.TranslationKey.Module)
-            )
-            .ToList();
-
-        _dbContext.TranslationValues.RemoveRange(translationValuesQuery);
+        _dbContext.TranslationValues.AddRange(translationValues);
+        _dbContext.SaveChanges();
     }
 
-    public void Commit() => _dbContext.SaveChanges();
+    public void RemoveRange(IEnumerable<TranslationValue> translationValues)
+    {
+        _dbContext.TranslationValues.RemoveRange(translationValues);
+        _dbContext.SaveChanges();
+    }
 }

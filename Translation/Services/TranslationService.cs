@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using Newtonsoft.Json.Linq;
+using Translation.Classes;
 using Translation.Dto.TranslationResult;
 using Translation.Models;
 using Translation.Repositories;
@@ -45,41 +46,65 @@ public class TranslationService
     private void SyncTranslations(string folderPath)
     {
         var savedLanguages = _languageRepository.ListAll();
-        var savedTranslationFiles = _translationFileRepository.List();
+        var savedTranslationFiles = _translationFileRepository.ListAll();
         var savedTranslationsKey = _translationKeyRepository.ListAll();
         var savedTranslationsValue = _translationValueRepository.ListAll();
         var currentTranslationFilesPath = GetCurrentFilesPath(folderPath).ToList();
+
+        var translationResult = UpdateThenGetTranslationSyncResult(
+            currentTranslationFilesPath,
+            savedTranslationFiles,
+            savedLanguages,
+            savedTranslationsKey,
+            savedTranslationsValue
+        );
+
+        _translationFileRepository.AddRange(translationResult.AllNewTranslationsFile);
+
+        _translationKeyRepository.AddRange(translationResult.AllNewTranslationsKey);
+
+        _translationValueRepository.AddRange(translationResult.AllNewTranslationsValue);
+
+        _translationValueRepository.RemoveRange(translationResult.AllUnusedTranslationsValue);
+
+        _translationKeyRepository.RemoveRange(translationResult.AllUnusedTranslationsKey);
+
+        _translationFileRepository.RemoveRange(translationResult.AllUnusedTranslationsFile);
+    }
+
+    private static TranslationSyncResult UpdateThenGetTranslationSyncResult(
+        List<string> currentTranslationFilesPath,
+        IReadOnlyCollection<TranslationFile> savedTranslationFiles,
+        IReadOnlyCollection<Language> savedLanguages,
+        IReadOnlyCollection<TranslationKey> savedTranslationsKey,
+        IReadOnlyCollection<TranslationValue> savedTranslationsValue
+    )
+    {
+        var translationSyncResult = new TranslationSyncResult();
 
         foreach (var filePath in currentTranslationFilesPath)
         {
             var fileContent = File.ReadAllText(filePath);
             var fileHash = GetHash(fileContent);
 
-            var savedTranslationFile = savedTranslationFiles.Find(x => x.FilePath == filePath);
+            var translationFile = savedTranslationFiles.FirstOrDefault(x => x.FilePath == filePath);
 
-            if (savedTranslationFile != null && savedTranslationFile.FileHash == fileHash) continue;
+            if (translationFile != null && translationFile.FileHash == fileHash) continue;
 
-            TranslationFile translationFile;
+            translationFile ??= new TranslationFile();
 
-            if (savedTranslationFile != null)
-            {
-                translationFile = savedTranslationFile;
-                translationFile.FileHash = fileHash;
-            }
-            else
-            {
-                translationFile = new TranslationFile
-                {
-                    FilePath = filePath,
-                    FileHash = fileHash
-                };
-            }
+            translationFile.FilePath = filePath;
+            translationFile.FileHash = fileHash;
 
             var (languageCode, module) = translationFile.GetFileInfo();
 
-            var language = savedLanguages.Find(l => l.Code == languageCode)!;
+            var language = savedLanguages.First(l => l.Code == languageCode)!;
 
-            var savedModuleTranslationsKey = savedTranslationsKey.Where(x => x.Module == module).ToList();
+            var savedModuleTranslationsKey = savedTranslationsKey
+                .Concat(translationSyncResult.AllNewTranslationsKey)
+                .Where(x => x.Module == module)
+                .ToList();
+
             var savedModuleTranslationsValue = savedTranslationsValue
                 .Where(x => x.TranslationKey.Module == module && x.LanguageId == language.Id)
                 .ToList();
@@ -92,71 +117,82 @@ public class TranslationService
                 .Where(x => savedModuleTranslationsKey.All(y => y.Key != x.Key))
                 .ToList();
 
-            _translationKeyRepository.AddRange(newTranslationsKey);
+            translationSyncResult.AllNewTranslationsKey.AddRange(newTranslationsKey);
 
             var allTranslationsKey = savedModuleTranslationsKey.Concat(newTranslationsKey).ToList();
 
             var newTranslationsValue = new List<TranslationValue>();
-            var updatedTranslationsValue = new List<TranslationValue>();
 
             foreach (var result in translationResults)
             {
                 var translationKey = allTranslationsKey.First(x => x.Key == result.Key);
 
-                var translationValue = savedModuleTranslationsValue
-                    .FirstOrDefault(x => x.TranslationKeyId == translationKey.Id);
+                var translationValue = savedModuleTranslationsValue.FirstOrDefault(x =>
+                    translationKey.Id != Guid.Empty && x.TranslationKeyId == translationKey.Id
+                );
+
+                if (translationValue != null && translationValue.DefaultValue == result.Value) continue;
 
                 if (translationValue == null)
                 {
-                    var newTranslationValue = new TranslationValue
+                    translationValue ??= new TranslationValue
                     {
-                        TranslationKeyId = translationKey.Id,
                         LanguageId = language.Id,
                         DefaultValue = result.Value,
+                        TranslationKey = translationKey
                     };
 
-                    newTranslationsValue.Add(newTranslationValue);
+                    newTranslationsValue.Add(translationValue);
                 }
                 else if (translationValue.DefaultValue != result.Value)
                 {
                     translationValue.DefaultValue = result.Value;
-                    updatedTranslationsValue.Add(translationValue);
                 }
             }
 
-            _translationValueRepository.AddRange(newTranslationsValue);
-            _translationValueRepository.UpdateRange(updatedTranslationsValue);
+            translationSyncResult.AllNewTranslationsValue.AddRange(newTranslationsValue);
 
             var allTranslationsValue = savedModuleTranslationsValue
                 .Concat(newTranslationsValue)
-                .Concat(updatedTranslationsValue)
                 .ToList();
 
-            var unusedSavedTranslationValues = allTranslationsValue
+            var translationsValueDeletedKey = allTranslationsValue
                 .Where(x => translationResults.All(y => y.Key != x.TranslationKey.Key))
                 .ToList();
 
-            _translationValueRepository.DeleteRange(unusedSavedTranslationValues);
+            translationSyncResult.AllUnusedTranslationsValue.AddRange(translationsValueDeletedKey);
 
-            if (translationFile.Id.Equals(null)) _translationFileRepository.Create(translationFile);
-            else _translationFileRepository.Update(translationFile);
+            if (translationFile.Id == Guid.Empty) translationSyncResult.AllNewTranslationsFile.Add(translationFile);
         }
 
-        var unusedSavedTranslationFiles = savedTranslationFiles
+        translationSyncResult.AllUnusedTranslationsFile = savedTranslationFiles
             .Where(x => currentTranslationFilesPath.All(y => y != x.FilePath))
             .ToList();
 
-        _translationValueRepository.DeleteAllByFiles(unusedSavedTranslationFiles, savedTranslationsValue);
+        var allUnusedTranslationsFileInfo =
+            translationSyncResult.AllUnusedTranslationsFile.Select(x => x.GetFileInfo()).ToList();
 
-        _translationFileRepository.RemoveRange(unusedSavedTranslationFiles);
+        var translationsValueDeletedFile = savedTranslationsValue.Where(x =>
+            allUnusedTranslationsFileInfo.Any(y =>
+                y.languageCode == x.Language.Code && y.module == x.TranslationKey.Module
+            )
+        );
 
-        _translationKeyRepository.RemoveAllUnusedKeys();
+        translationSyncResult.AllUnusedTranslationsValue.AddRange(translationsValueDeletedFile);
 
-        _translationKeyRepository.Commit();
+        translationSyncResult.AllUnusedTranslationsKey = savedTranslationsKey
+            .Where(x => !x
+                .Values
+                .Any(y =>
+                    y.DefaultValue != null &&
+                    !translationSyncResult.AllUnusedTranslationsValue.Any(z =>
+                        z.TranslationKeyId == y.TranslationKeyId && z.LanguageId == y.LanguageId
+                    )
+                )
+            )
+            .ToList();
 
-        _translationValueRepository.Commit();
-
-        _translationFileRepository.Commit();
+        return translationSyncResult;
     }
 
     private static IEnumerable<string> GetCurrentFilesPath(string folderPath)

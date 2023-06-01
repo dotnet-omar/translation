@@ -1,4 +1,5 @@
 using LinqKit;
+using Microsoft.EntityFrameworkCore;
 using Translation.Classes;
 using Translation.Data;
 using Translation.Dto.TranslationKey;
@@ -12,7 +13,10 @@ public class TranslationKeyRepository
 
     public TranslationKeyRepository(TranslationContext dbContext) => _dbContext = dbContext;
 
-    public List<TranslationKey> ListAll() => _dbContext.TranslationKeys.ToList();
+    public List<TranslationKey> ListAll() => _dbContext
+        .TranslationKeys
+        .Include(x => x.Values)
+        .ToList();
 
     public Pagination<TranslationKeyListDto> List(
         Guid languageId,
@@ -118,17 +122,15 @@ public class TranslationKeyRepository
             .FirstOrDefault();
     }
 
-    public void AddRange(IEnumerable<TranslationKey> translationKeys) =>
-        _dbContext.TranslationKeys.AddRange(translationKeys);
-
-    public void RemoveAllUnusedKeys()
+    public void AddRange(IEnumerable<TranslationKey> translationKeys)
     {
-        var unusedTranslationKeys = _dbContext
-            .TranslationKeys
-            .Where(x => !x.Values.Any() || x.Values.All(y => y.DefaultValue == null));
-
-        _dbContext.TranslationKeys.RemoveRange(unusedTranslationKeys);
+        _dbContext.TranslationKeys.AddRange(translationKeys);
+        _dbContext.SaveChanges();
     }
 
-    public void Commit() => _dbContext.SaveChanges();
+    public void RemoveRange(IEnumerable<TranslationKey> translationKeys)
+    {
+        _dbContext.TranslationKeys.RemoveRange(translationKeys);
+        _dbContext.SaveChanges();
+    }
 }
