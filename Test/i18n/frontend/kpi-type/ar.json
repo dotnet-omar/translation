@@ -1,0 +1,12 @@
+{
+  "translate_new_kpi_type": "نوع مؤشر أداء جديد",
+  "translate_edit_kpi_type": "تعديل نوع مؤشر أداء",
+  "translate_add_new_kpi_type": "إضافة نوع مؤشر أداء جديد",
+  "translate_update_existing_kpi_type": "تحديث نوع مؤشر أداء",
+  "translate_is_used_to_compute_goal_achievement": "يستخدم لحساب انجاز الأهداف",
+  "translate_is_considered_in_dashboard": "يستخدم في الصفحة الرئيسية",
+  "translate_is_excluded_from_calculations": "مستثنى من الحسابات",
+  "translate_is_linkable_to_plans": "يمكن ربطه بالخطط التشغيلية",
+  "translate_code": "الرمز",
+  "translate_order": "الترتيب"
+}

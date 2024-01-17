@@ -1,0 +1,12 @@
+{
+  "translate_new_kpi_type": "New kpi type",
+  "translate_edit_kpi_type": "Edit kpi type",
+  "translate_add_new_kpi_type": "Add new kpi type",
+  "translate_update_existing_kpi_type": "Update existing kpi type",
+  "translate_is_used_to_compute_goal_achievement": "Is used to compute goal achievement",
+  "translate_is_considered_in_dashboard": "Is considered in dashboard",
+  "translate_is_excluded_from_calculations": "Is excluded from calculations",
+  "translate_is_linkable_to_plans": "Is linkable to plans",
+  "translate_code": "Code",
+  "translate_order": "Order"
+}

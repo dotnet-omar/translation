@@ -1,0 +1,11 @@
+{
+  "translate_login": "Login",
+  "translate_login_caps": "LOGIN",
+  "translate_email_and_password_should_be_filled": "Email and password should be filled.",
+  "translate_logged_in_successfully": "Logged in successfully.",
+  "translate_recover_password": "Recover Password",
+  "translate_toggle_language": "Toggle language",
+  "username_and_password_combination_is_invalid": "Username and password combination is invalid.",
+  "translate_version_number_version": "Version number {{version}}",
+  "translate_sign_in_with_office_365": "Sign in with Office 365"
+}

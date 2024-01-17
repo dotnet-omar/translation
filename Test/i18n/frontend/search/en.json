@@ -1,0 +1,16 @@
+{
+  "translate_search_results": "Search results",
+  "translate_result_evidence": "Evidence",
+  "translate_result_capability": "Capability",
+  "translate_result_operation": "Operation",
+  "translate_result_kpi": "KPI",
+  "translate_result_plan": "Plan",
+  "translate_result_type": "Result type",
+  "translate_type_your_search_query": "Type your search query",
+  "translate_search_scope": "Search scope",
+  "translate_search_evidence": "Search in evidence",
+  "translate_search_capabilities": "Search in capabilities",
+  "translate_search_operations": "Search in operations",
+  "translate_search_kpis": "Search in KPIs",
+  "translate_search_plans": "Search in operational plans"
+}

@@ -1,0 +1,13 @@
+{
+  "translate_new_team": "فريق جديد",
+  "translate_edit_team": "تعديل فريق",
+  "translate_add_new_team": "إضافة فريق جديد",
+  "translate_update_existing_team": "تحديث فريق",
+  "translate_team_details": "تفاصيل الفريق",
+  "translate_members_count": "عدد الأعضاء",
+  "translate_team_leaders": "قادة الفريق",
+  "translate_team_members": "أعضاء الفريق",
+  "translate_is_leader": "قائد الفريق؟",
+  "translate_non_member_users": "المستخدمون الغير أعضاء",
+  "translate_are_you_sure_you_want_to_remove_the_user_from_the_team": "هل أنت متأكد من إزالة المستخدم من الفريق؟"
+}

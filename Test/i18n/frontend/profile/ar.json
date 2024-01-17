@@ -1,0 +1,10 @@
+{
+  "translate_user_info": "معلومات المستخدم",
+  "translate_email": "البريد الإلكتروني",
+  "translate_creation_time": "تاريخ الإنشاء",
+  "translate_change_password": "تغيير رمز المرور",
+  "translate_current_password": "رمز المرور الحالي",
+  "translate_new_password": "رمز المرور الجديد",
+  "translate_confirm_password": "تأكيد رمز المرور",
+  "translate_you_have_to_change_the_password_to_continue_using_the_system": "يجب عليك تغيير كلمة المرور لتتمكن من استخدام النظام."
+}

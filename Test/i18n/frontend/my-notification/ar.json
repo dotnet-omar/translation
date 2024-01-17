@@ -1,0 +1,12 @@
+{
+    "translate_notification_details": "تفاصيل التنبيه",
+    "translate_notification": "التنبيه",
+    "translate_search_by_title": "البحث بالعنوان",
+    "translate_search_by_date": "البحث بالتاريخ",
+    "translate_creation_time": "تاريخ الإنشاء",
+    "translate_notification_title": "عنوان التنبيه",
+    "translate_notification_description": "وصف التنبيه",
+    "translate_unread_only": "الغير مقروء فقط",
+    "translate_mark_as_read": "تحويل إلى مقروء",
+    "translate_mark_all_as_read": "تحويل الكل إلى مقروء"
+}

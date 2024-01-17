@@ -1,0 +1,13 @@
+{
+  "translate_new_team": "New team",
+  "translate_edit_team": "Edit team",
+  "translate_add_new_team": "Add new team",
+  "translate_update_existing_team": "Update existing team",
+  "translate_team_details": "Team details",
+  "translate_members_count": "Members count",
+  "translate_team_leaders": "Team leaders",
+  "translate_team_members": "Team members",
+  "translate_is_leader": "Is leader?",
+  "translate_non_member_users": "Non-member users",
+  "translate_are_you_sure_you_want_to_remove_the_user_from_the_team": "Are you sure you want to remove the user from the team?"
+}

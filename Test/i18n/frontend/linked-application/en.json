@@ -1,0 +1,9 @@
+{
+  "translate_new_linked_application": "New linked application",
+  "translate_edit_linked_application": "Edit linked application",
+  "translate_add_new_linked_application": "Add new linked application",
+  "translate_update_existing_linked_application": "Update existing linked application",
+  "translate_linked_user": "Linked user",
+  "translate_your_linked_application_has_been_created": "Your linked application has been created",
+  "translate_linked_application_creation_details": "The linked application has been created successfully. Down below are the details for the application, make sure to store these details in a safe place now (you will NOT be able to retrieve these details later)."
+}

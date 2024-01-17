@@ -1,0 +1,10 @@
+{
+  "translate_user_info": "User info",
+  "translate_email": "Email address",
+  "translate_creation_time": "Creation time",
+  "translate_change_password": "Change password",
+  "translate_current_password": "Current password",
+  "translate_new_password": "New password",
+  "translate_confirm_password": "Confirm password",
+  "translate_you_have_to_change_the_password_to_continue_using_the_system": "You have to change the password to continue using the system."
+}
